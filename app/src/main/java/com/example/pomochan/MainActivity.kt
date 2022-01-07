@@ -3,8 +3,8 @@ package com.example.pomochan
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.view.View
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.TextView
 import com.example.pomochan.databinding.ActivityMainBinding
 
@@ -17,24 +17,19 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     lateinit var mCountDownTimer: CountDownTimer
-    lateinit var mTextViewCountdown: TextView
-    lateinit var mButtonStartPause: Button
-    lateinit var mButtonReset: Button
+
     var mTimerRunning = false
+    var progr = 0
 
     // Keeps track of time
     var mTimeLeftInMillis = TimerConstants.START_TIME_IN_MILLIS
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
         binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        mTextViewCountdown = findViewById(R.id.textViewCountdown)
-        mButtonStartPause = findViewById(R.id.buttonStartPause)
-        mButtonReset = findViewById(R.id.buttonReset)
-
-        mButtonStartPause.setOnClickListener {
+        binding.buttonStartPause.setOnClickListener {
             if (mTimerRunning) {
                 pauseTimer()
             } else {
@@ -42,7 +37,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        mButtonReset.setOnClickListener {
+        binding.buttonReset.setOnClickListener {
             resetTimer()
         }
 
@@ -56,16 +51,18 @@ class MainActivity : AppCompatActivity() {
                 // If the timer stops our variable keeps track of it
                 mTimeLeftInMillis = millisUntilFinished
                 updateCountdownText()
+                progr++
+                updateProgressBar()
             }
 
             override fun onFinish() {
                 mTimerRunning = false
-                mButtonStartPause.text = "Start"
+                binding.buttonStartPause.text = getString(R.string.start_timer)
             }
         }.start()
 
         mTimerRunning = true
-        mButtonStartPause.text = "Pause"
+        binding.buttonStartPause.text = getString(R.string.pause_timer)
     }
 
     private fun updateCountdownText() {
@@ -75,23 +72,28 @@ class MainActivity : AppCompatActivity() {
         // Converts minutes and seconds to a String
         var timeLeftFormatted = String.format("%02d:%02d", minutes, seconds)
 
-        mTextViewCountdown.text = timeLeftFormatted
+        binding.textViewCountdown.text = timeLeftFormatted
     }
 
     private fun pauseTimer() {
         mCountDownTimer.cancel()
         mTimerRunning = false
-        mButtonStartPause.text = "Start"
+        binding.buttonStartPause.text = getString(R.string.start_timer)
     }
 
     private fun resetTimer() {
         mTimeLeftInMillis = TimerConstants.START_TIME_IN_MILLIS
         pauseTimer()
         updateCountdownText()
+        resetProgressBar()
     }
 
     fun updateProgressBar() {
-
+        binding.progressBar.progress = progr
     }
 
+    fun resetProgressBar() {
+        progr = 0
+        updateProgressBar()
+    }
 }
