@@ -13,7 +13,7 @@ class MainActivityViewModel : ViewModel() {
 
     object TimerConstants {
         // 1500000 = 25 min
-        const val START_TIME_IN_MILLIS: Long = 5000
+        const val START_TIME_IN_MILLIS: Long = 1500000
     }
 
     private lateinit var countDownTimer: CountDownTimer
@@ -70,12 +70,6 @@ class MainActivityViewModel : ViewModel() {
             }
         }.start()
         _timerRunning.value = true
-    }
-
-    fun restartTimer() {
-        if (_finished.value == true) {
-            startTimer()
-        }
     }
 
     fun pauseTimer() {

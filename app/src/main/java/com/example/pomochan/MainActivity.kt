@@ -3,6 +3,8 @@ package com.example.pomochan
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
@@ -67,5 +69,18 @@ class MainActivity : AppCompatActivity() {
             viewModel.resetProgressBar()
             binding.textViewCountdown.text = "25:00"
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.nav_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.nav_settings -> Toast.makeText(this, "Settings selected", Toast.LENGTH_SHORT).show()
+            R.id.nav_about -> Toast.makeText(this, "About selected", Toast.LENGTH_SHORT).show()
+        }
+        return super.onOptionsItemSelected(item)
     }
 }
