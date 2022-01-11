@@ -6,94 +6,66 @@ import android.os.CountDownTimer
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.example.pomochan.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
-    object TimerConstants {
-        // Start time 25 min
-        const val START_TIME_IN_MILLIS: Long = 1500000
-    }
-
     private lateinit var binding: ActivityMainBinding
-
-    lateinit var mCountDownTimer: CountDownTimer
-
-    var mTimerRunning = false
-    var progr = 0
-
-    // Keeps track of time
-    var mTimeLeftInMillis = TimerConstants.START_TIME_IN_MILLIS
+    private lateinit var viewModel: MainActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.buttonStartPause.setOnClickListener {
-            if (mTimerRunning) {
-                pauseTimer()
+        viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
+
+        // Countdown
+        viewModel.timerString.observe(this, Observer {
+            binding.textViewCountdown.text = it
+        })
+
+        // Timer finish
+        viewModel.finished.observe(this, Observer {
+            if (it) {
+                Toast.makeText(this, "Finished!", Toast.LENGTH_SHORT).show()
+            }
+        })
+
+        // Start/Pause button text changes
+        viewModel.timerRunning.observe(this, Observer {
+            if (it) {
+                binding.buttonStartPause.text = getString(R.string.pause_timer)
             } else {
-                startTimer()
-            }
-        }
-
-        binding.buttonReset.setOnClickListener {
-            resetTimer()
-        }
-
-        updateCountdownText()
-    }
-
-    private fun startTimer() {
-        // Creates a CountDownTimer object
-        mCountDownTimer = object : CountDownTimer(mTimeLeftInMillis, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                // If the timer stops our variable keeps track of it
-                mTimeLeftInMillis = millisUntilFinished
-                updateCountdownText()
-                progr++
-                updateProgressBar()
-            }
-
-            override fun onFinish() {
-                mTimerRunning = false
                 binding.buttonStartPause.text = getString(R.string.start_timer)
             }
-        }.start()
+        })
 
-        mTimerRunning = true
-        binding.buttonStartPause.text = getString(R.string.pause_timer)
-    }
+        // Progressbar
+        viewModel.progressBarLiveData.observe(this, Observer {
+            binding.progressBar.progress = it
+        })
 
-    private fun updateCountdownText() {
-        var minutes = (mTimeLeftInMillis / 1000) / 60
-        var seconds = (mTimeLeftInMillis / 1000) % 60
+        // Start/Pause button
+        binding.buttonStartPause.setOnClickListener {
+            if (viewModel.timerRunning.value == true) {
+                viewModel.pauseTimer()
+            } else if (viewModel.finished.value == true) {
+                viewModel.resetTimer()
+                viewModel.resetProgressBar()
+                viewModel.startTimer()
+            } else {
+                viewModel.startTimer()
+            }
+        }
 
-        // Converts minutes and seconds to a String
-        var timeLeftFormatted = String.format("%02d:%02d", minutes, seconds)
-
-        binding.textViewCountdown.text = timeLeftFormatted
-    }
-
-    private fun pauseTimer() {
-        mCountDownTimer.cancel()
-        mTimerRunning = false
-        binding.buttonStartPause.text = getString(R.string.start_timer)
-    }
-
-    private fun resetTimer() {
-        mTimeLeftInMillis = TimerConstants.START_TIME_IN_MILLIS
-        pauseTimer()
-        updateCountdownText()
-        resetProgressBar()
-    }
-
-    fun updateProgressBar() {
-        binding.progressBar.progress = progr
-    }
-
-    fun resetProgressBar() {
-        progr = 0
-        updateProgressBar()
+        // Reset button
+        binding.buttonReset.setOnClickListener {
+            viewModel.resetTimer()
+            viewModel.resetProgressBar()
+            binding.textViewCountdown.text = "25:00"
+        }
     }
 }
