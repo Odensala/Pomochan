@@ -27,6 +27,9 @@ class MainActivityViewModel : ViewModel() {
     // Progressbar progress
     var progr = 0
 
+    // Timer initiated
+    var timerInitiated = false
+
     // Checks if timer is running
     private val _timerRunning = MutableLiveData(false)
     val timerRunning: LiveData<Boolean>
@@ -70,6 +73,7 @@ class MainActivityViewModel : ViewModel() {
             }
         }.start()
         _timerRunning.value = true
+        timerInitiated = true
     }
 
     fun pauseTimer() {
@@ -78,11 +82,13 @@ class MainActivityViewModel : ViewModel() {
     }
 
     fun resetTimer() {
-        // Resets milliseconds
-        timeLeftInMillis = TimerConstants.START_TIME_IN_MILLIS
+        if (timerInitiated) {
+            // Resets milliseconds
+            timeLeftInMillis = TimerConstants.START_TIME_IN_MILLIS
 
-        pauseTimer()
-        resetProgressBar()
+            pauseTimer()
+            resetProgressBar()
+        }
     }
 
     fun updateCountdownText(): String {
