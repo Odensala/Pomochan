@@ -1,4 +1,4 @@
-package com.example.pomochan
+package com.example.pomochan.main
 
 import android.os.CountDownTimer
 import android.util.Log
@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class MainActivityViewModel : ViewModel() {
+
     init {
         Log.i("MainActivityViewModel", "MainActivityViewModel created!")
     }
@@ -20,9 +21,10 @@ class MainActivityViewModel : ViewModel() {
 
     // Holds time in milliseconds
     var timeLeftInMillis = TimerConstants.START_TIME_IN_MILLIS
-    /*private val _timeLeftInMillis = MutableLiveData(TimerConstants.START_TIME_IN_MILLIS)
-    val timeLeftInMillis: MutableLiveData<Long>
-        get() = _timeLeftInMillis*/
+
+    private val _pomodoroTime = MutableLiveData<String>()
+    val pomodoroTime: MutableLiveData<String>
+        get() = _pomodoroTime
 
     // Progressbar progress
     var progr = 0
@@ -60,7 +62,7 @@ class MainActivityViewModel : ViewModel() {
                 timeLeftInMillis = millisUntilFinished
 
                 // Sends calculated and formatted String to LiveData
-                _timerString.value = updateCountdownText()
+                _timerString.value = formatText()
 
                 // Updates progressbar
                 progr++
@@ -91,7 +93,7 @@ class MainActivityViewModel : ViewModel() {
         }
     }
 
-    fun updateCountdownText(): String {
+    fun formatText(): String {
         // Separates timeLeftInMillis into minutes and seconds
         var minutes = (timeLeftInMillis / 1000) / 60
         var seconds = (timeLeftInMillis / 1000) % 60
@@ -104,6 +106,10 @@ class MainActivityViewModel : ViewModel() {
     fun resetProgressBar() {
         progr = 0
         _progressBarLiveData.value = progr
+    }
+
+    fun pomodoroTime() {
+        _pomodoroTime.value = formatText()
     }
 
     override fun onCleared() {

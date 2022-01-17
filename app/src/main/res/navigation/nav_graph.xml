@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.example.pomochan.MainFragment"
+        android:name="com.example.pomochan.main.MainFragment"
         android:label="fragment_main"
         tools:layout="@layout/fragment_main" >
         <action
@@ -19,6 +19,9 @@
         <action
             android:id="@+id/action_mainFragment_to_feedbackFragment2"
             app:destination="@id/feedbackFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_breakFragment"
+            app:destination="@id/breakFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
@@ -38,4 +41,12 @@
         android:name="com.example.pomochan.FeedbackFragment"
         android:label="fragment_feedback"
         tools:layout="@layout/fragment_feedback" />
+    <fragment
+        android:id="@+id/breakFragment"
+        android:name="com.example.pomochan.break.BreakFragment"
+        android:label="BreakFragment" >
+        <action
+            android:id="@+id/action_breakFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+    </fragment>
 </navigation>

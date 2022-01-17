@@ -1,4 +1,4 @@
-package com.example.pomochan
+package com.example.pomochan.main
 
 import android.os.Bundle
 import android.view.*
@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.NavigationUI
+import com.example.pomochan.R
 import com.example.pomochan.databinding.FragmentMainBinding
 
 class MainFragment : Fragment(R.layout.fragment_main) {
@@ -72,7 +73,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         }
 
         binding.buttonBreak.setOnClickListener {
-            val action = MainFragmentDirections.actionMainFragmentToSettingsFragment()
+            val action = MainFragmentDirections.actionMainFragmentToBreakFragment()
             findNavController().navigate(action)
         }
         setHasOptionsMenu(true)
