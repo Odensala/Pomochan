@@ -23,4 +23,7 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="pomochan">Pomochan</string>
+    <string name="short_break">Short Break</string>
+    <string name="long_break">Long Break</string>
 </resources>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/mainFragment"
+        android:title="@string/pomochan"
+        android:icon="@drawable/ic_timer"/>
+    <item
+        android:id="@+id/breakFragment"
+        android:title="@string/short_break"
+        android:icon="@drawable/ic_cafe"/>
+    <item
+        android:id="@+id/breakLongFragment"
+        android:title="@string/long_break"
+        android:icon="@drawable/ic_videogame"/>
+</menu>

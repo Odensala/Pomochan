@@ -8,8 +8,8 @@
     <fragment
         android:id="@+id/mainFragment"
         android:name="com.example.pomochan.main.MainFragment"
-        android:label="fragment_main"
-        tools:layout="@layout/fragment_main" >
+        android:label="Pomochan"
+        tools:layout="@layout/fragment_main">
         <action
             android:id="@+id/action_mainFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
@@ -19,14 +19,21 @@
         <action
             android:id="@+id/action_mainFragment_to_feedbackFragment2"
             app:destination="@id/feedbackFragment" />
-        <action
-            android:id="@+id/action_mainFragment_to_breakFragment"
-            app:destination="@id/breakFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/breakFragment"
+        android:name="com.example.pomochan.break.BreakFragment"
+        android:label="Short break"
+        tools:layout="@layout/fragment_break" />
+    <fragment
+        android:id="@+id/breakLongFragment"
+        android:name="com.example.pomochan.breaklong.BreakLongFragment"
+        android:label="Long break"
+        tools:layout="@layout/fragment_break_long" />
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.example.pomochan.SettingsFragment"
-        android:label="SettingsFragment" >
+        android:label="SettingsFragment">
         <action
             android:id="@+id/action_settingsFragment_to_mainFragment"
             app:destination="@id/mainFragment" />
@@ -41,12 +48,5 @@
         android:name="com.example.pomochan.FeedbackFragment"
         android:label="fragment_feedback"
         tools:layout="@layout/fragment_feedback" />
-    <fragment
-        android:id="@+id/breakFragment"
-        android:name="com.example.pomochan.break.BreakFragment"
-        android:label="BreakFragment" >
-        <action
-            android:id="@+id/action_breakFragment_to_mainFragment"
-            app:destination="@id/mainFragment" />
-    </fragment>
+
 </navigation>
