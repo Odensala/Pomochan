@@ -1,4 +1,4 @@
-package com.example.pomochan.`break`
+package com.example.pomochan.shortbreak
 
 import android.os.Bundle
 import android.view.*

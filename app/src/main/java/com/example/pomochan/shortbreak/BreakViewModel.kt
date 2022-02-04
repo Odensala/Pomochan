@@ -1,4 +1,4 @@
-package com.example.pomochan.main
+package com.example.pomochan.shortbreak
 
 import android.os.CountDownTimer
 import android.util.Log
@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class MainActivityViewModel : ViewModel() {
+class BreakViewModel : ViewModel() {
 
     init {
         Log.i("MainActivityViewModel", "MainActivityViewModel created!")
@@ -14,7 +14,7 @@ class MainActivityViewModel : ViewModel() {
 
     object TimerConstants {
         // 1500000 = 25 min
-        const val START_TIME_IN_MILLIS: Long = 1500000
+        const val START_TIME_IN_MILLIS: Long = 300000
     }
 
     private lateinit var countDownTimer: CountDownTimer

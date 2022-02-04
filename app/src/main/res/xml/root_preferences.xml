@@ -1,18 +1,29 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory app:title="@string/messages_header">
+    <PreferenceCategory app:title="@string/timer_durations_header">
 
-        <EditTextPreference
-            app:key="signature"
-            app:title="@string/signature_title"
+        <ListPreference
+            app:defaultValue="1500000"
+            app:entries="@array/timer_entries"
+            app:entryValues="@array/timer_values"
+            app:key="timer"
+            app:title="@string/timer_settings_title"
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
-            app:defaultValue="reply"
-            app:entries="@array/reply_entries"
-            app:entryValues="@array/reply_values"
-            app:key="reply"
-            app:title="@string/reply_title"
+            app:defaultValue="5"
+            app:entries="@array/shortbreak_entries"
+            app:entryValues="@array/shortbreak_values"
+            app:key="shortbreak"
+            app:title="@string/shortbreak_settings_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="20"
+            app:entries="@array/longbreak_entries"
+            app:entryValues="@array/longbreak_values"
+            app:key="longbreak"
+            app:title="@string/longbreak_settings_title"
             app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>

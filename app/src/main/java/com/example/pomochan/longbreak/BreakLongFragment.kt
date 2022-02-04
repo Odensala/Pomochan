@@ -1,6 +1,5 @@
-package com.example.pomochan.main
+package com.example.pomochan.longbreak
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
@@ -9,27 +8,22 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
-import com.example.pomochan.Constants.ACTION_START_OR_RESUME_SERVICE
 import com.example.pomochan.R
-import com.example.pomochan.TimerService
-import com.example.pomochan.databinding.FragmentMainBinding
+import com.example.pomochan.databinding.FragmentBreakLongBinding
 
-class MainFragment : Fragment(R.layout.fragment_main) {
+class BreakLongFragment : Fragment(R.layout.fragment_break_long) {
 
-    private lateinit var binding: FragmentMainBinding
-    private lateinit var viewModel: MainViewModel
-    private lateinit var viewModelFactory: MainViewModelFactory
+    private lateinit var binding: FragmentBreakLongBinding
+    private lateinit var viewModel: BreakLongViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentMainBinding.inflate(inflater, container, false)
+        binding = FragmentBreakLongBinding.inflate(inflater, container, false)
 
-        val application = requireNotNull(activity).application
-        viewModelFactory = MainViewModelFactory(application)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(BreakLongViewModel::class.java)
 
         // Countdown
         viewModel.timerString.observe(viewLifecycleOwner, Observer {
@@ -54,12 +48,11 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         // Progressbar
         viewModel.progressBarLiveData.observe(viewLifecycleOwner, Observer {
-            binding.progressBar.progress = it
+            binding.progressBarHor.progress = it
         })
 
         // Start/Pause button
         binding.buttonStartPause.setOnClickListener {
-            sendCommandToService(ACTION_START_OR_RESUME_SERVICE)
             if (viewModel.timerRunning.value == true) {
                 viewModel.pauseTimer()
             } else if (viewModel.finished.value == true) {
@@ -75,21 +68,15 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         binding.buttonReset.setOnClickListener {
             viewModel.resetTimer()
             viewModel.resetProgressBar()
-            binding.textViewCountdown.text = viewModel.timerString.value
+            binding.textViewCountdown.text = "30:00"
         }
 
         setHasOptionsMenu(true)
         return binding.root
     }
 
-    /**
-     * Delivers intent to our service
-     */
-    private fun sendCommandToService(action: String) {
-        Intent(requireContext(), TimerService::class.java).also {
-            it.action = action
-            requireContext().startService(it)
-        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

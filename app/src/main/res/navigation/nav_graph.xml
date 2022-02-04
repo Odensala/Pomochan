@@ -5,6 +5,10 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/mainFragment">
 
+    <action android:id="@+id/action_global_mainFragment"
+        app:destination="@id/mainFragment"
+        app:launchSingleTop="true"/>
+
     <fragment
         android:id="@+id/mainFragment"
         android:name="com.example.pomochan.main.MainFragment"
@@ -22,18 +26,18 @@
     </fragment>
     <fragment
         android:id="@+id/breakFragment"
-        android:name="com.example.pomochan.break.BreakFragment"
+        android:name="com.example.pomochan.shortbreak.BreakFragment"
         android:label="Short break"
         tools:layout="@layout/fragment_break" />
     <fragment
         android:id="@+id/breakLongFragment"
-        android:name="com.example.pomochan.breaklong.BreakLongFragment"
+        android:name="com.example.pomochan.longbreak.BreakLongFragment"
         android:label="Long break"
         tools:layout="@layout/fragment_break_long" />
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.example.pomochan.SettingsFragment"
-        android:label="SettingsFragment">
+        android:label="Settings">
         <action
             android:id="@+id/action_settingsFragment_to_mainFragment"
             app:destination="@id/mainFragment" />

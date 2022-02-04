@@ -3,19 +3,19 @@
     <string name="start_timer">Start</string>
     <string name="pause_timer">Pause</string>
     <string name="reset_timer">Reset</string>
-    <string name="break_timer">Break</string>
 
     <!-- Menu Titles -->
     <string name="settings_menu">Settings</string>
-    <string name="feedback_menu">Give feedback</string>
+    <string name="feedback_menu">Send feedback</string>
 
-    <!-- Preference Titles -->
-    <string name="messages_header">Messages</string>
+    <!-- Preferences Headers -->
+    <string name="timer_durations_header">Timer durations</string>
     <string name="sync_header">Sync</string>
 
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
+    <!-- Preferences titles -->
+    <string name="timer_settings_title">Pomochan</string>
+    <string name="shortbreak_settings_title">Short break</string>
+    <string name="longbreak_settings_title">Long break</string>
 
     <!-- Sync Preferences -->
     <string name="sync_title">Sync email periodically</string>
