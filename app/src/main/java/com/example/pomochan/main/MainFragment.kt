@@ -1,6 +1,5 @@
 package com.example.pomochan.main
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
@@ -9,9 +8,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
-import com.example.pomochan.Constants.ACTION_START_OR_RESUME_SERVICE
 import com.example.pomochan.R
-import com.example.pomochan.TimerService
 import com.example.pomochan.databinding.FragmentMainBinding
 
 class MainFragment : Fragment(R.layout.fragment_main) {
@@ -59,7 +56,6 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         // Start/Pause button
         binding.buttonStartPause.setOnClickListener {
-            sendCommandToService(ACTION_START_OR_RESUME_SERVICE)
             if (viewModel.timerRunning.value == true) {
                 viewModel.pauseTimer()
             } else if (viewModel.finished.value == true) {
@@ -80,16 +76,6 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         setHasOptionsMenu(true)
         return binding.root
-    }
-
-    /**
-     * Delivers intent to our service
-     */
-    private fun sendCommandToService(action: String) {
-        Intent(requireContext(), TimerService::class.java).also {
-            it.action = action
-            requireContext().startService(it)
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

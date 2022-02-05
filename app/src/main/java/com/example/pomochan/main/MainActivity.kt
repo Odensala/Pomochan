@@ -9,8 +9,8 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.example.pomochan.Constants.ACTION_SHOW_MAIN_FRAGMENT
 import com.example.pomochan.R
+import com.example.pomochan.TimerService
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -19,7 +19,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        navigateToMainFragmentIfNeeded(intent)
+        val intent = Intent(this, TimerService::class.java)
+        startForegroundService(intent)
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         val navHostFragment =
@@ -49,23 +50,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        navigateToMainFragmentIfNeeded(intent)
-    }
-
     /**
      * Enables up button navigation
      */
     override fun onSupportNavigateUp(): Boolean {
         val navController = this.findNavController(R.id.nav_host_fragment)
         return navController.navigateUp()
-    }
-
-    private fun navigateToMainFragmentIfNeeded(intent: Intent?) {
-        if(intent?.action == ACTION_SHOW_MAIN_FRAGMENT) {
-            val navController = this.findNavController(R.id.nav_host_fragment)
-            navController.navigate(R.id.action_global_mainFragment)
-        }
     }
 }
