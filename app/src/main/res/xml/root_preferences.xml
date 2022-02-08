@@ -11,7 +11,7 @@
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
-            app:defaultValue="5"
+            app:defaultValue="300000"
             app:entries="@array/shortbreak_entries"
             app:entryValues="@array/shortbreak_values"
             app:key="shortbreak"
@@ -19,27 +19,12 @@
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
-            app:defaultValue="20"
+            app:defaultValue="1200000"
             app:entries="@array/longbreak_entries"
             app:entryValues="@array/longbreak_values"
             app:key="longbreak"
             app:title="@string/longbreak_settings_title"
             app:useSimpleSummaryProvider="true" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory app:title="@string/sync_header">
-
-        <SwitchPreferenceCompat
-            app:key="sync"
-            app:title="@string/sync_title" />
-
-        <SwitchPreferenceCompat
-            app:dependency="sync"
-            app:key="attachment"
-            app:summaryOff="@string/attachment_summary_off"
-            app:summaryOn="@string/attachment_summary_on"
-            app:title="@string/attachment_title" />
 
     </PreferenceCategory>
 

@@ -33,7 +33,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
 
     init {
-        // Implying this works
+        // TODO Implying this works
         preferences.registerOnSharedPreferenceChangeListener(listener)
         Log.i("MainViewModel", "$userSetTime")
         //userSetTime = preferences.getString("pomochan", "1500000")?.toLong()!!
@@ -84,6 +84,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 // Updates progressbar
                 progressBarProgress++
                 _progressBarLiveData.value = progressBarProgress
+
+
             }
 
             override fun onFinish() {
@@ -127,6 +129,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     override fun onCleared() {
         super.onCleared()
+        // TODO Cancel the timer
         preferences.unregisterOnSharedPreferenceChangeListener(listener)
         Log.i("MainViewModel", "MainViewModel destroyed!")
     }

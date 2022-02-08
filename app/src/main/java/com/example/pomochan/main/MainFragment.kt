@@ -1,5 +1,6 @@
 package com.example.pomochan.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
@@ -9,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.example.pomochan.R
+import com.example.pomochan.TimerService
 import com.example.pomochan.databinding.FragmentMainBinding
 
 class MainFragment : Fragment(R.layout.fragment_main) {
@@ -56,6 +58,8 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         // Start/Pause button
         binding.buttonStartPause.setOnClickListener {
+            requireActivity().startForegroundService(Intent(context, TimerService::class.java))
+
             if (viewModel.timerRunning.value == true) {
                 viewModel.pauseTimer()
             } else if (viewModel.finished.value == true) {
