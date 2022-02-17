@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
+import timber.log.Timber
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -35,7 +36,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     init {
         // TODO Implying this works
         preferences.registerOnSharedPreferenceChangeListener(listener)
-        Log.i("MainViewModel", "$userSetTime")
+        Log.d("MainViewModel", "$userSetTime")
         //userSetTime = preferences.getString("pomochan", "1500000")?.toLong()!!
         //currentTime = preferences.getString("pomochan", "1500000")?.toLong()!!
     }
@@ -72,7 +73,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     /**
      * Timer
      */
-    fun startTimer() {
+    /*fun startTimer() {
         countDownTimer = object : CountDownTimer(currentTime, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 // If the timer stops our variable keeps track of it
@@ -95,14 +96,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }.start()
         _timerRunning.value = true
         timerInitiated = true
-    }
+    }*/
 
-    fun pauseTimer() {
+
+
+    /*fun pauseTimer() {
         countDownTimer.cancel()
         _timerRunning.value = false
-    }
+    }*/
 
-    fun resetTimer() {
+    /*fun resetTimer() {
         if (timerInitiated) {
             // Resets milliseconds
             currentTime = TimerConstants.START_TIME_IN_MILLIS
@@ -111,16 +114,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             resetProgressBar()
             _timerString.value = formatText(currentTime)
         }
-    }
-
-    fun formatText(timeInMillis: Long): String {
-        // Separates timeInMillis into minutes and seconds
-        var minutes = (timeInMillis / 1000) / 60
-        var seconds = (timeInMillis / 1000) % 60
-
-        // Converts minutes and seconds to a String
-        return String.format("%02d:%02d", minutes, seconds)
-    }
+    }*/
 
     fun resetProgressBar() {
         progressBarProgress = 0
@@ -131,6 +125,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         super.onCleared()
         // TODO Cancel the timer
         preferences.unregisterOnSharedPreferenceChangeListener(listener)
-        Log.i("MainViewModel", "MainViewModel destroyed!")
+        Timber.i("MainViewModel destroyed!")
     }
 }

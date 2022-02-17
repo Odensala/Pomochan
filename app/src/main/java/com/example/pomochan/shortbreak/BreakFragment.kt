@@ -8,6 +8,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
+import androidx.preference.PreferenceManager
 import com.example.pomochan.R
 import com.example.pomochan.databinding.FragmentBreakBinding
 
@@ -24,6 +25,8 @@ class BreakFragment : Fragment(R.layout.fragment_break) {
         binding = FragmentBreakBinding.inflate(inflater, container, false)
 
         viewModel = ViewModelProvider(this).get(BreakViewModel::class.java)
+
+        loadSettings()
 
         // Countdown
         viewModel.timerString.observe(viewLifecycleOwner, Observer {
@@ -73,6 +76,13 @@ class BreakFragment : Fragment(R.layout.fragment_break) {
 
         setHasOptionsMenu(true)
         return binding.root
+    }
+
+    private fun loadSettings() {
+        val sp = PreferenceManager.getDefaultSharedPreferences(context)
+
+        val shortBreak = sp.getString("shortbreak", "")
+        binding.textView2.text = "Timer: $shortBreak"
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -18,15 +18,18 @@
     <string name="shortbreak_settings_title">Short break</string>
     <string name="longbreak_settings_title">Long break</string>
 
+    <!-- TimerService titles -->
     <string name="service_description">Pomochan timer running</string>
 
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <!-- Settings Dialog -->
+    <string name="title">Reset timer?</string>
+    <string name="supporting_text">Your timer is currently running. For the changes to take effect, the timer needs to be reset.</string>
+    <string name="cancel">Cancel</string>
+    <string name="decline">Decline</string>
+    <string name="accept">Reset</string>
+
     <string name="pomochan">Pomochan</string>
     <string name="short_break">Short Break</string>
     <string name="long_break">Long Break</string>
+
 </resources>
