@@ -2,6 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:title="Reset timer"
+        app:showAsAction="collapseActionView" />
+    <item
+        android:title="Reset session"
+        app:showAsAction="collapseActionView" />
+    <item
         android:id="@+id/settingsFragment"
         android:title="@string/settings_menu"
         app:showAsAction="collapseActionView" />

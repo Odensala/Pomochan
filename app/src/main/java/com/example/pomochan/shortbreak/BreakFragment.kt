@@ -1,21 +1,29 @@
 package com.example.pomochan.shortbreak
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import androidx.preference.PreferenceManager
+import com.example.pomochan.Constants
 import com.example.pomochan.R
+import com.example.pomochan.TimerService
 import com.example.pomochan.databinding.FragmentBreakBinding
+import com.example.pomochan.utils.TimerUtils
+import timber.log.Timber
 
 class BreakFragment : Fragment(R.layout.fragment_break) {
 
     private lateinit var binding: FragmentBreakBinding
     private lateinit var viewModel: BreakViewModel
+    private lateinit var timerSetting: String
+
+    private var currentTimeInMillis = 0L
+    private var timerRunning = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -26,67 +34,88 @@ class BreakFragment : Fragment(R.layout.fragment_break) {
 
         viewModel = ViewModelProvider(this).get(BreakViewModel::class.java)
 
+        binding.textViewCountdown.text = loadSettings()?.let { TimerUtils.formatTime(it) }
+
         loadSettings()
 
-        // Countdown
-        viewModel.timerString.observe(viewLifecycleOwner, Observer {
-            binding.textViewCountdown.text = it
-        })
+        if(TimerService.serviceIsRunning) {
+            Timber.d("timer is running")
+        }
 
-        // Timer finish
-        viewModel.finished.observe(viewLifecycleOwner, Observer {
-            if (it) {
-                Toast.makeText(context, "Finished!", Toast.LENGTH_SHORT).show()
-            }
-        })
-
-        // Start/Pause button text changes
-        viewModel.timerRunning.observe(viewLifecycleOwner, Observer {
-            if (it) {
-                binding.buttonStartPause.text = getString(R.string.pause_timer)
-            } else {
-                binding.buttonStartPause.text = getString(R.string.start_timer)
-            }
-        })
-
-        // Progressbar
+        /*// Progressbar
         viewModel.progressBarLiveData.observe(viewLifecycleOwner, Observer {
             binding.progressBarHor.progress = it
-        })
+        })*/
 
         // Start/Pause button
         binding.buttonStartPause.setOnClickListener {
-            if (viewModel.timerRunning.value == true) {
-                viewModel.pauseTimer()
-            } else if (viewModel.finished.value == true) {
-                viewModel.resetTimer()
-                viewModel.resetProgressBar()
-                viewModel.startTimer()
-            } else {
-                viewModel.startTimer()
-            }
+            toggleStart()
         }
 
         // Reset button
         binding.buttonReset.setOnClickListener {
-            viewModel.resetTimer()
-            viewModel.resetProgressBar()
-            binding.textViewCountdown.text = "05:00"
+            sendCommandToService(Constants.ACTION_STOP_SERVICE)
+            TimerService.serviceIsRunning = false
+
+            //viewModel.resetProgressBar()
+            binding.textViewCountdown.text = TimerUtils.formatTime(currentTimeInMillis)
         }
 
+        timerServiceObservers()
         setHasOptionsMenu(true)
         return binding.root
     }
 
-    private fun loadSettings() {
-        val sp = PreferenceManager.getDefaultSharedPreferences(context)
-
-        val shortBreak = sp.getString("shortbreak", "")
-        binding.textView2.text = "Timer: $shortBreak"
+    private fun toggleStart() {
+        if (timerRunning) {
+            sendCommandToService(Constants.ACTION_PAUSE_SERVICE)
+        } else {
+            sendCommandToService(Constants.ACTION_START_OR_RESUME_SERVICE)
+        }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    private fun timerServiceObservers() {
+        // Timer text
+        TimerService.currentTimeLiveData.observe(viewLifecycleOwner, Observer {
+            currentTimeInMillis = it
+            val formattedTime = TimerUtils.formatTime(currentTimeInMillis)
+            binding.textViewCountdown.text = formattedTime
+        })
+
+        //
+        TimerService.timerRunning.observe(viewLifecycleOwner, Observer {
+            updateRunning(it)
+        })
+    }
+
+    private fun updateRunning(timerRunning: Boolean) {
+        this.timerRunning = timerRunning
+        if (timerRunning) {
+            binding.buttonStartPause.text = getString(R.string.pause_timer)
+        } else {
+            binding.buttonStartPause.text = getString(R.string.start_timer)
+        }
+    }
+
+    private fun sendCommandToService(action: String) {
+        TimerService.serviceIsRunning = true
+        val intent = Intent(requireContext(), TimerService::class.java).also {
+            it.action = action
+        }
+        intent.apply {
+            putExtra(Constants.EXTRA_TIMER, loadSettings())
+        }
+        requireContext().startService(intent)
+    }
+
+    /**
+     * Loads shortbreak setting from SharedPreferences
+     * @return User set timer setting converted to long
+     */
+    private fun loadSettings(): Long? {
+        val sp = PreferenceManager.getDefaultSharedPreferences(context)
+        timerSetting = sp.getString("shortbreak", "").toString()
+        return timerSetting?.toLong()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

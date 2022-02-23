@@ -28,6 +28,9 @@
     <string name="decline">Decline</string>
     <string name="accept">Reset</string>
 
+    <!-- Break fragment Dialog -->
+    <string name="breakfragmenttitle">Reset timer?</string>
+
     <string name="pomochan">Pomochan</string>
     <string name="short_break">Short Break</string>
     <string name="long_break">Long Break</string>
