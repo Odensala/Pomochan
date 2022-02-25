@@ -34,6 +34,7 @@ class BreakFragment : Fragment(R.layout.fragment_break) {
 
         viewModel = ViewModelProvider(this).get(BreakViewModel::class.java)
 
+        Timber.d("loaded settings in break fragment ${loadSettings()?.let { TimerUtils.formatTime(it) }}")
         binding.textViewCountdown.text = loadSettings()?.let { TimerUtils.formatTime(it) }
 
         loadSettings()

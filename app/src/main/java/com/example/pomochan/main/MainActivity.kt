@@ -122,13 +122,13 @@ class MainActivity : AppCompatActivity() {
             .setMessage(resources.getString(R.string.supporting_text))
             .setNegativeButton(resources.getString(R.string.cancel)) { dialog, which ->
                 Timber.d("Negative button pressed")
-                //navController.previousBackStackEntry?.destination?.id
                 dialogCancel = true
             }
             .setPositiveButton(resources.getString(R.string.accept)) { dialog, which ->
                 // Resets timer on positive button press
                 navController.navigate(fragmentId)
                 sendCommandToService(Constants.ACTION_STOP_SERVICE)
+                TimerService.serviceIsRunning = false
                 dialogCancel = false
             }
             .show()

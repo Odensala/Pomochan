@@ -108,8 +108,8 @@ class TimerService : LifecycleService() {
         stopSelf()
         pauseTimer()
         // TODO needs values from shared pref
-        currentTime = 5000
-        currentTimeLiveData.value = currentTime
+        //currentTime = 5000
+        //currentTimeLiveData.value = currentTime
         //resetProgressBar()
 
     }
