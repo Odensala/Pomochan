@@ -149,6 +149,7 @@ class TimerService : LifecycleService() {
         }
     }
 
+    // TODO implement working timer in notification
     private fun buildNotification(pendingIntent: PendingIntent) {
         val notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setContentTitle("Pomochan")

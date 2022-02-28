@@ -33,16 +33,7 @@ class BreakLongFragment : Fragment(R.layout.fragment_break_long) {
         binding = FragmentBreakLongBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(this).get(BreakLongViewModel::class.java)
 
-        binding.textViewCountdown.text = loadSettings().let { TimerUtils.formatTime(it) }
-        Timber.d(loadSettings().let { TimerUtils.formatTime(it) })
-
-        loadSettings()
-
-        if (TimerService.serviceIsRunning) {
-            Timber.d("timer is running")
-        }
-
-        observeTimerRunning()
+        refreshStartTime()
 
         /*// Progressbar
         viewModel.progressBarLiveData.observe(viewLifecycleOwner, Observer {
@@ -61,9 +52,7 @@ class BreakLongFragment : Fragment(R.layout.fragment_break_long) {
 
             //viewModel.resetProgressBar()
             currentTimeInMillis = loadSettings()
-            Timber.d(" currentimeinmillis: $currentTimeInMillis")
-            //binding.textViewCountdown.text = TimerUtils.formatTime(currentTimeInMillis)
-            binding.textViewCountdown.text = loadSettings().let { TimerUtils.formatTime(it) }
+            refreshStartTime()
         }
 
         setHasOptionsMenu(true)
@@ -75,11 +64,16 @@ class BreakLongFragment : Fragment(R.layout.fragment_break_long) {
         Timber.d("BreakLongFragment destroyed")
     }
 
+    private fun refreshStartTime() {
+        binding.textViewCountdown.text = loadSettings().let { TimerUtils.formatTime(it) }
+    }
+
     private fun toggleStart() {
         if (timerRunning) {
             sendCommandToService(Constants.ACTION_PAUSE_SERVICE)
         } else {
             sendCommandToService(Constants.ACTION_START_OR_RESUME_SERVICE)
+            timerServiceObservers()
         }
     }
 
@@ -92,12 +86,9 @@ class BreakLongFragment : Fragment(R.layout.fragment_break_long) {
             binding.textViewCountdown.text = formattedTime
             Timber.d("$formattedTime")
         })
-    }
 
-    private fun observeTimerRunning() {
         TimerService.timerRunning.observe(viewLifecycleOwner, Observer {
             updateRunning(it)
-            timerServiceObservers()
         })
     }
 
@@ -127,7 +118,7 @@ class BreakLongFragment : Fragment(R.layout.fragment_break_long) {
      */
     private fun loadSettings(): Long {
         val sp = PreferenceManager.getDefaultSharedPreferences(context)
-        timerSetting = sp.getString("longbreak", "").toString()
+        timerSetting = sp.getString("longbreak", "1200000").toString()
         return timerSetting.toLong()
     }
 

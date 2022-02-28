@@ -34,8 +34,7 @@ class BreakFragment : Fragment(R.layout.fragment_break) {
 
         viewModel = ViewModelProvider(this).get(BreakViewModel::class.java)
 
-        Timber.d("loaded settings in break fragment ${loadSettings()?.let { TimerUtils.formatTime(it) }}")
-        binding.textViewCountdown.text = loadSettings()?.let { TimerUtils.formatTime(it) }
+        refreshStartTime()
 
         loadSettings()
 
@@ -59,10 +58,9 @@ class BreakFragment : Fragment(R.layout.fragment_break) {
             TimerService.serviceIsRunning = false
 
             //viewModel.resetProgressBar()
-            binding.textViewCountdown.text = TimerUtils.formatTime(currentTimeInMillis)
+            refreshStartTime()
         }
 
-        timerServiceObservers()
         setHasOptionsMenu(true)
         return binding.root
     }
@@ -72,10 +70,15 @@ class BreakFragment : Fragment(R.layout.fragment_break) {
             sendCommandToService(Constants.ACTION_PAUSE_SERVICE)
         } else {
             sendCommandToService(Constants.ACTION_START_OR_RESUME_SERVICE)
+            updateCountdown()
         }
     }
 
-    private fun timerServiceObservers() {
+    private fun refreshStartTime() {
+        binding.textViewCountdown.text = loadSettings().let { TimerUtils.formatTime(it) }
+    }
+
+    private fun updateCountdown() {
         // Timer text
         TimerService.currentTimeLiveData.observe(viewLifecycleOwner, Observer {
             currentTimeInMillis = it
@@ -83,10 +86,9 @@ class BreakFragment : Fragment(R.layout.fragment_break) {
             binding.textViewCountdown.text = formattedTime
         })
 
-        //
-        TimerService.timerRunning.observe(viewLifecycleOwner, Observer {
+        TimerService.timerRunning.observe(viewLifecycleOwner) {
             updateRunning(it)
-        })
+        }
     }
 
     private fun updateRunning(timerRunning: Boolean) {
@@ -113,10 +115,10 @@ class BreakFragment : Fragment(R.layout.fragment_break) {
      * Loads shortbreak setting from SharedPreferences
      * @return User set timer setting converted to long
      */
-    private fun loadSettings(): Long? {
+    private fun loadSettings(): Long {
         val sp = PreferenceManager.getDefaultSharedPreferences(context)
-        timerSetting = sp.getString("shortbreak", "").toString()
-        return timerSetting?.toLong()
+        timerSetting = sp.getString("shortbreak", "300000").toString()
+        return timerSetting.toLong()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

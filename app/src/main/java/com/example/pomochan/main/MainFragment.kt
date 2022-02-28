@@ -39,9 +39,9 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         viewModelFactory = MainViewModelFactory(application)
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
 
-        binding.textViewCountdown.text = loadSettings()?.let { TimerUtils.formatTime(it) }
+        refreshStartTime()
 
-        loadSettings()
+        //loadSettings()
 
         /*// Progressbar
         viewModel.progressBarLiveData.observe(viewLifecycleOwner, Observer {
@@ -59,9 +59,9 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             TimerService.serviceIsRunning = false
 
             //viewModel.resetProgressBar()
-            binding.textViewCountdown.text = TimerUtils.formatTime(currentTimeInMillis)
+            refreshStartTime()
         }
-        timerServiceObservers()
+
         setHasOptionsMenu(true)
         return binding.root
     }
@@ -71,7 +71,12 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             sendCommandToService(ACTION_PAUSE_SERVICE)
         } else {
             sendCommandToService(ACTION_START_OR_RESUME_SERVICE)
+            timerServiceObservers()
         }
+    }
+
+    private fun refreshStartTime() {
+        binding.textViewCountdown.text = loadSettings().let { TimerUtils.formatTime(it) }
     }
 
     private fun timerServiceObservers() {
@@ -118,10 +123,10 @@ class MainFragment : Fragment(R.layout.fragment_main) {
      * Loads timer setting from SharedPreferences
      * @return User set timer setting converted to long
      */
-    private fun loadSettings(): Long? {
+    private fun loadSettings(): Long {
         val sp = PreferenceManager.getDefaultSharedPreferences(context)
-        timerSetting = sp.getString("timer", "").toString()
-        return timerSetting?.toLong()
+        timerSetting = sp.getString("timer", "1500000").toString()
+        return timerSetting.toLong()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
