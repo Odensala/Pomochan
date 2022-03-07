@@ -36,12 +36,6 @@ class BreakFragment : Fragment(R.layout.fragment_break) {
 
         refreshStartTime()
 
-        loadSettings()
-
-        if(TimerService.serviceIsRunning) {
-            Timber.d("timer is running")
-        }
-
         /*// Progressbar
         viewModel.progressBarLiveData.observe(viewLifecycleOwner, Observer {
             binding.progressBarHor.progress = it

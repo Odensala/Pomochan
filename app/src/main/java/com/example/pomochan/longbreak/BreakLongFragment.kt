@@ -51,7 +51,7 @@ class BreakLongFragment : Fragment(R.layout.fragment_break_long) {
             TimerService.serviceIsRunning = false
 
             //viewModel.resetProgressBar()
-            currentTimeInMillis = loadSettings()
+            //currentTimeInMillis = loadSettings()
             refreshStartTime()
         }
 
@@ -64,21 +64,21 @@ class BreakLongFragment : Fragment(R.layout.fragment_break_long) {
         Timber.d("BreakLongFragment destroyed")
     }
 
-    private fun refreshStartTime() {
-        binding.textViewCountdown.text = loadSettings().let { TimerUtils.formatTime(it) }
-    }
-
     private fun toggleStart() {
         if (timerRunning) {
             sendCommandToService(Constants.ACTION_PAUSE_SERVICE)
         } else {
             sendCommandToService(Constants.ACTION_START_OR_RESUME_SERVICE)
-            timerServiceObservers()
+            updateCountdown()
         }
     }
 
+    private fun refreshStartTime() {
+        binding.textViewCountdown.text = loadSettings().let { TimerUtils.formatTime(it) }
+    }
+
     // TODO Issue with that the formattedTime is being set instead of the sharedpref after reset
-    private fun timerServiceObservers() {
+    private fun updateCountdown() {
         // Timer text
         TimerService.currentTimeLiveData.observe(viewLifecycleOwner, Observer {
             currentTimeInMillis = it

@@ -25,7 +25,7 @@ class TimerService : LifecycleService() {
 
     private lateinit var countDownTimer: CountDownTimer
     private var startingTime: Long = 0
-
+    private var timerStarted = false
     private var currentTime: Long = 5000
 
     var isFirstRun = true
@@ -66,7 +66,9 @@ class TimerService : LifecycleService() {
                 }
                 ACTION_STOP_SERVICE -> {
                     Timber.i("Stopped service")
-                    resetTimer()
+                    if (timerStarted) {
+                        resetTimer()
+                    }
                 }
             }
         }
@@ -77,6 +79,7 @@ class TimerService : LifecycleService() {
      * Timer
      */
     private fun startTimer() {
+        timerStarted = true
         countDownTimer = object : CountDownTimer(currentTime, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 // If the timer stops our variable keeps track of it
@@ -107,11 +110,12 @@ class TimerService : LifecycleService() {
     private fun resetTimer() {
         stopSelf()
         pauseTimer()
+        onDestroy()
+        timerStarted = false
         // TODO needs values from shared pref
         //currentTime = 5000
         //currentTimeLiveData.value = currentTime
         //resetProgressBar()
-
     }
 
     override fun onDestroy() {

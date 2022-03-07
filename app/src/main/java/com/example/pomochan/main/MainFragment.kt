@@ -41,8 +41,6 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         refreshStartTime()
 
-        //loadSettings()
-
         /*// Progressbar
         viewModel.progressBarLiveData.observe(viewLifecycleOwner, Observer {
             binding.progressBar.progress = it
@@ -71,7 +69,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             sendCommandToService(ACTION_PAUSE_SERVICE)
         } else {
             sendCommandToService(ACTION_START_OR_RESUME_SERVICE)
-            timerServiceObservers()
+            updateCountdown()
         }
     }
 
@@ -79,7 +77,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         binding.textViewCountdown.text = loadSettings().let { TimerUtils.formatTime(it) }
     }
 
-    private fun timerServiceObservers() {
+    private fun updateCountdown() {
         // Timer text
         TimerService.currentTimeLiveData.observe(viewLifecycleOwner, Observer {
             currentTimeInMillis = it
@@ -87,7 +85,6 @@ class MainFragment : Fragment(R.layout.fragment_main) {
             binding.textViewCountdown.text = formattedTime
         })
 
-        //
         TimerService.timerRunning.observe(viewLifecycleOwner, Observer {
             updateRunning(it)
         })
