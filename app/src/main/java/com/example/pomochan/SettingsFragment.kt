@@ -2,11 +2,13 @@ package com.example.pomochan
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import com.example.pomochan.Constants.ACTION_STOP_SERVICE
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import timber.log.Timber
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
@@ -16,15 +18,19 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
-        // TODO make a conditional statement that asks if user wants to proceed with changing the setting and cancelling timer
-        // TODO if user proceeds change value
-        // TODO if user cancels revert previous value
+        // TODO issue where user resets timer, changes time and reset prompt
+        // TODO incorrectly comes up again. I think its because old TimerService.serviceIsRunning value is being used.
         timerOldValue = loadSettings()
+        Timber.d("timerOldValue is ${timerOldValue}")
         if (TimerService.serviceIsRunning) {
+            Timber.d("TimerService is ${TimerService.serviceIsRunning}")
             listenOnPreferenceChanged()
+            Timber.d("TimerService end is ${TimerService.serviceIsRunning}")
         }
     }
 
+    // TODO I think the issue is here where the old value is compared
+    // TODO therefore triggering the dialog
     private fun listenOnPreferenceChanged() {
         findPreference<Preference>("timer")?.setOnPreferenceChangeListener { preference, newValue ->
             if (newValue !== timerOldValue) {
@@ -46,6 +52,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 // Respond to positive button press
                 //Toast.makeText(context, "Pomochan timer changed", Toast.LENGTH_SHORT).show()
                 sendCommandToService(ACTION_STOP_SERVICE)
+                TimerService.serviceIsRunning = false
+
             }
             .show()
     }
@@ -57,6 +65,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun sendCommandToService(action: String) {
+        // serviceIsRunning is set to false here because
+        // service can only be stopped from this screen
+        TimerService.serviceIsRunning = false
         val intent = Intent(requireContext(), TimerService::class.java).also {
             it.action = action
         }

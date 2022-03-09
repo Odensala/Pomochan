@@ -26,6 +26,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     private lateinit var timerSetting: String
 
     private var currentTimeInMillis = 0L
+    // Decides whether timer is running or paused
     private var timerRunning = false
 
     override fun onCreateView(
@@ -33,6 +34,12 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
+        // Necessary to check else app crashes because service is reset outside this fragment
+        // and the value here is not checked without this
+        if(!TimerService.serviceIsRunning) {
+            timerRunning = false
+        }
         binding = FragmentMainBinding.inflate(inflater, container, false)
 
         val application = requireNotNull(activity).application
@@ -53,17 +60,23 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         // Reset button
         binding.buttonReset.setOnClickListener {
-            sendCommandToService(ACTION_STOP_SERVICE)
-            TimerService.serviceIsRunning = false
+            if (TimerService.serviceIsRunning) {
+                sendCommandToService(ACTION_STOP_SERVICE)
+                TimerService.serviceIsRunning = false
 
-            //viewModel.resetProgressBar()
-            refreshStartTime()
+                //viewModel.resetProgressBar()
+                refreshStartTime()
+            }
         }
 
         setHasOptionsMenu(true)
         return binding.root
     }
 
+    // TODO because we are cancelling the timer outside of this (in SettingsFragment), what happens is that
+    // TODO timerRunning is not properly updated to false causing it to send a PAUSE
+    // TODO request and then crashing the app because the PAUSE action is called on an
+    // TODO uninitialized countdowntimer object
     private fun toggleStart() {
         if (timerRunning) {
             sendCommandToService(ACTION_PAUSE_SERVICE)
