@@ -33,6 +33,8 @@ class BreakLongFragment : Fragment(R.layout.fragment_break_long) {
         binding = FragmentBreakLongBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(this).get(BreakLongViewModel::class.java)
 
+        // Method needed to observe when fragment is recreated
+        updateCountdown()
         refreshStartTime()
 
         /*// Progressbar
@@ -47,12 +49,13 @@ class BreakLongFragment : Fragment(R.layout.fragment_break_long) {
 
         // Reset button
         binding.buttonReset.setOnClickListener {
-            sendCommandToService(Constants.ACTION_STOP_SERVICE)
-            TimerService.serviceIsRunning = false
+            if (TimerService.serviceIsRunning.value == true) {
+                sendCommandToService(Constants.ACTION_STOP_SERVICE)
+                TimerService.serviceIsRunning.value = false
 
-            //viewModel.resetProgressBar()
-            //currentTimeInMillis = loadSettings()
-            refreshStartTime()
+                //viewModel.resetProgressBar()
+                refreshStartTime()
+            }
         }
 
         setHasOptionsMenu(true)
@@ -79,17 +82,19 @@ class BreakLongFragment : Fragment(R.layout.fragment_break_long) {
 
     // TODO Issue with that the formattedTime is being set instead of the sharedpref after reset
     private fun updateCountdown() {
-        // Timer text
-        TimerService.currentTimeLiveData.observe(viewLifecycleOwner, Observer {
-            currentTimeInMillis = it
-            val formattedTime = TimerUtils.formatTime(currentTimeInMillis)
-            binding.textViewCountdown.text = formattedTime
-            Timber.d("$formattedTime")
-        })
+        // Conditional necessary to make timer update properly when exiting settingsfragment
+        if (TimerService.serviceIsRunning.value == true) {
+            // Timer text
+            TimerService.currentTimeLiveData.observe(viewLifecycleOwner, Observer {
+                currentTimeInMillis = it
+                val formattedTime = TimerUtils.formatTime(currentTimeInMillis)
+                binding.textViewCountdown.text = formattedTime
+            })
 
-        TimerService.timerRunning.observe(viewLifecycleOwner, Observer {
-            updateRunning(it)
-        })
+            TimerService.timerRunning.observe(viewLifecycleOwner, Observer {
+                updateRunning(it)
+            })
+        }
     }
 
     private fun updateRunning(timerRunning: Boolean) {
@@ -102,7 +107,7 @@ class BreakLongFragment : Fragment(R.layout.fragment_break_long) {
     }
 
     private fun sendCommandToService(action: String) {
-        TimerService.serviceIsRunning = true
+        TimerService.serviceIsRunning.value = true
         val intent = Intent(requireContext(), TimerService::class.java).also {
             it.action = action
         }

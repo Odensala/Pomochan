@@ -17,6 +17,7 @@ import com.example.pomochan.R
 import com.example.pomochan.TimerService
 import com.example.pomochan.databinding.FragmentMainBinding
 import com.example.pomochan.utils.TimerUtils
+import timber.log.Timber
 
 class MainFragment : Fragment(R.layout.fragment_main) {
 
@@ -26,6 +27,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
     private lateinit var timerSetting: String
 
     private var currentTimeInMillis = 0L
+
     // Decides whether timer is running or paused
     private var timerRunning = false
 
@@ -34,18 +36,23 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
+        Timber.d("onCreate called MainFragment")
         // Necessary to check else app crashes because service is reset outside this fragment
         // and the value here is not checked without this
-        if(!TimerService.serviceIsRunning) {
+        if (TimerService.serviceIsRunning.value == false) {
             timerRunning = false
         }
+
+        // Method needed to observe when fragment is recreated
+        updateCountdown()
+
         binding = FragmentMainBinding.inflate(inflater, container, false)
 
         val application = requireNotNull(activity).application
         viewModelFactory = MainViewModelFactory(application)
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
 
+        // Sets correct start time
         refreshStartTime()
 
         /*// Progressbar
@@ -60,9 +67,9 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
         // Reset button
         binding.buttonReset.setOnClickListener {
-            if (TimerService.serviceIsRunning) {
+            if (TimerService.serviceIsRunning.value == true) {
                 sendCommandToService(ACTION_STOP_SERVICE)
-                TimerService.serviceIsRunning = false
+                TimerService.serviceIsRunning.value = false
 
                 //viewModel.resetProgressBar()
                 refreshStartTime()
@@ -88,19 +95,23 @@ class MainFragment : Fragment(R.layout.fragment_main) {
 
     private fun refreshStartTime() {
         binding.textViewCountdown.text = loadSettings().let { TimerUtils.formatTime(it) }
+        Timber.d("refreshStartTime: ${loadSettings().let { TimerUtils.formatTime(it) }}")
     }
 
     private fun updateCountdown() {
-        // Timer text
-        TimerService.currentTimeLiveData.observe(viewLifecycleOwner, Observer {
-            currentTimeInMillis = it
-            val formattedTime = TimerUtils.formatTime(currentTimeInMillis)
-            binding.textViewCountdown.text = formattedTime
-        })
+        // Conditional necessary to make timer update properly when exiting settingsfragment
+        if (TimerService.serviceIsRunning.value == true) {
+            // Timer text
+            TimerService.currentTimeLiveData.observe(viewLifecycleOwner, Observer {
+                currentTimeInMillis = it
+                val formattedTime = TimerUtils.formatTime(currentTimeInMillis)
+                binding.textViewCountdown.text = formattedTime
+            })
 
-        TimerService.timerRunning.observe(viewLifecycleOwner, Observer {
-            updateRunning(it)
-        })
+            TimerService.timerRunning.observe(viewLifecycleOwner, Observer {
+                updateRunning(it)
+            })
+        }
     }
 
     private fun updateRunning(timerRunning: Boolean) {
@@ -119,7 +130,7 @@ class MainFragment : Fragment(R.layout.fragment_main) {
      * NOTE! This doesn't start the service, instead only delivers intent
      */
     private fun sendCommandToService(action: String) {
-        TimerService.serviceIsRunning = true
+        TimerService.serviceIsRunning.value = true
         val intent = Intent(requireContext(), TimerService::class.java).also {
             it.action = action
         }

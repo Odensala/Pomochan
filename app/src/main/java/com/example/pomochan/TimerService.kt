@@ -34,7 +34,7 @@ class TimerService : LifecycleService() {
     companion object {
         val currentTimeLiveData = MutableLiveData<Long>()
         val timerRunning = MutableLiveData<Boolean>()
-        var serviceIsRunning = false
+        var serviceIsRunning = MutableLiveData<Boolean>()
     }
 
     override fun onCreate() {
@@ -84,6 +84,7 @@ class TimerService : LifecycleService() {
                 // If the timer stops our variable keeps track of it
                 currentTime = millisUntilFinished
                 currentTimeLiveData.value = currentTime
+                Timber.d("Timer: $currentTime")
 
                 /*// Updates progressbar
                 progressBarProgress++

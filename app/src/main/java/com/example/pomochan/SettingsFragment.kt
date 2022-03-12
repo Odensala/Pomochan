@@ -2,7 +2,9 @@ package com.example.pomochan
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
@@ -18,23 +20,40 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
-        // TODO issue where user resets timer, changes time and reset prompt
-        // TODO incorrectly comes up again. I think its because old TimerService.serviceIsRunning value is being used.
+
         timerOldValue = loadSettings()
-        Timber.d("timerOldValue is ${timerOldValue}")
-        if (TimerService.serviceIsRunning) {
-            Timber.d("TimerService is ${TimerService.serviceIsRunning}")
-            listenOnPreferenceChanged()
-            Timber.d("TimerService end is ${TimerService.serviceIsRunning}")
+        resetDialogOnBackstack()
+
+
+
+    }
+
+
+    private fun listenOnMainPreferenceChanged() {
+        findPreference<Preference>("timer")?.setOnPreferenceChangeListener { preference, newValue ->
+            if (newValue !== timerOldValue && TimerService.serviceIsRunning.value == true) {
+                dialogOnPreferenceChanged()
+                timerOldValue = newValue.toString()
+            }
+            true
         }
     }
 
-    // TODO I think the issue is here where the old value is compared
-    // TODO therefore triggering the dialog
-    private fun listenOnPreferenceChanged() {
-        findPreference<Preference>("timer")?.setOnPreferenceChangeListener { preference, newValue ->
-            if (newValue !== timerOldValue) {
+    private fun listenOnShortBreakPreferenceChanged() {
+        findPreference<Preference>("shortbreak")?.setOnPreferenceChangeListener { preference, newValue ->
+            if (newValue !== timerOldValue && TimerService.serviceIsRunning.value == true) {
                 dialogOnPreferenceChanged()
+                timerOldValue = newValue.toString()
+            }
+            true
+        }
+    }
+
+    private fun listenOnLongBreakPreferenceChanged() {
+        findPreference<Preference>("longbreak")?.setOnPreferenceChangeListener { preference, newValue ->
+            if (newValue !== timerOldValue && TimerService.serviceIsRunning.value == true) {
+                dialogOnPreferenceChanged()
+                timerOldValue = newValue.toString()
             }
             true
         }
@@ -46,14 +65,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
             .setMessage(resources.getString(R.string.supporting_text))
             .setNegativeButton(resources.getString(R.string.cancel)) { dialog, which ->
                 // Respond to negative button press
-
             }
             .setPositiveButton(resources.getString(R.string.accept)) { dialog, which ->
                 // Respond to positive button press
                 //Toast.makeText(context, "Pomochan timer changed", Toast.LENGTH_SHORT).show()
                 sendCommandToService(ACTION_STOP_SERVICE)
-                TimerService.serviceIsRunning = false
-
+                TimerService.serviceIsRunning.value = false
             }
             .show()
     }
@@ -65,12 +82,32 @@ class SettingsFragment : PreferenceFragmentCompat() {
     }
 
     private fun sendCommandToService(action: String) {
-        // serviceIsRunning is set to false here because
-        // service can only be stopped from this screen
-        TimerService.serviceIsRunning = false
         val intent = Intent(requireContext(), TimerService::class.java).also {
             it.action = action
         }
         requireContext().startService(intent)
+    }
+
+    private fun NavController.isFragmentInBackStack(destinationId: Int) =
+        try {
+            getBackStackEntry(destinationId)
+            true
+        } catch (e: Exception) {
+            false
+        }
+
+    /**
+     * Enables reset of timer depending on which timer is running
+     */
+    private fun resetDialogOnBackstack() {
+        if (findNavController().isFragmentInBackStack(R.id.mainFragment)) {
+            listenOnMainPreferenceChanged()
+        } else if (findNavController().isFragmentInBackStack(R.id.breakFragment)) {
+            Timber.d("WOW BACKSTACK BREAKFRAGMENT FOUND BRAH")
+            listenOnShortBreakPreferenceChanged()
+        } else if (findNavController().isFragmentInBackStack(R.id.breakLongFragment)) {
+            Timber.d("WOW BACKSTACK BREAKLONGFRAGMENT FOUND BRAH")
+            listenOnLongBreakPreferenceChanged()
+        }
     }
 }

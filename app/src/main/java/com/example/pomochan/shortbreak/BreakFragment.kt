@@ -30,6 +30,12 @@ class BreakFragment : Fragment(R.layout.fragment_break) {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        if (TimerService.serviceIsRunning.value == false) {
+            timerRunning = false
+        }
+
+        // Method needed to observe when fragment is recreated
+        updateCountdown()
         binding = FragmentBreakBinding.inflate(inflater, container, false)
 
         viewModel = ViewModelProvider(this).get(BreakViewModel::class.java)
@@ -48,11 +54,13 @@ class BreakFragment : Fragment(R.layout.fragment_break) {
 
         // Reset button
         binding.buttonReset.setOnClickListener {
-            sendCommandToService(Constants.ACTION_STOP_SERVICE)
-            TimerService.serviceIsRunning = false
+            if (TimerService.serviceIsRunning.value == true) {
+                sendCommandToService(Constants.ACTION_STOP_SERVICE)
+                TimerService.serviceIsRunning.value = false
 
-            //viewModel.resetProgressBar()
-            refreshStartTime()
+                //viewModel.resetProgressBar()
+                refreshStartTime()
+            }
         }
 
         setHasOptionsMenu(true)
@@ -73,15 +81,18 @@ class BreakFragment : Fragment(R.layout.fragment_break) {
     }
 
     private fun updateCountdown() {
-        // Timer text
-        TimerService.currentTimeLiveData.observe(viewLifecycleOwner, Observer {
-            currentTimeInMillis = it
-            val formattedTime = TimerUtils.formatTime(currentTimeInMillis)
-            binding.textViewCountdown.text = formattedTime
-        })
+        // Conditional necessary to make timer update properly when exiting settingsfragment
+        if (TimerService.serviceIsRunning.value == true) {
+            // Timer text
+            TimerService.currentTimeLiveData.observe(viewLifecycleOwner, Observer {
+                currentTimeInMillis = it
+                val formattedTime = TimerUtils.formatTime(currentTimeInMillis)
+                binding.textViewCountdown.text = formattedTime
+            })
 
-        TimerService.timerRunning.observe(viewLifecycleOwner) {
-            updateRunning(it)
+            TimerService.timerRunning.observe(viewLifecycleOwner, Observer {
+                updateRunning(it)
+            })
         }
     }
 
@@ -95,7 +106,7 @@ class BreakFragment : Fragment(R.layout.fragment_break) {
     }
 
     private fun sendCommandToService(action: String) {
-        TimerService.serviceIsRunning = true
+        TimerService.serviceIsRunning.value = true
         val intent = Intent(requireContext(), TimerService::class.java).also {
             it.action = action
         }

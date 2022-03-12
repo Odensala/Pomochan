@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
                     // TODO nothing should happen. The it.itemId != R.id.mainFragment option
                     // TODO didn't work properly
 
-                    if (TimerService.serviceIsRunning && !it.isChecked) {
+                    if (TimerService.serviceIsRunning.value == true && !it.isChecked) {
                         if (dialogOnPreferenceChanged(R.id.mainFragment, navController)) {
                             // If user cancelled dialog
                             return@setOnItemSelectedListener false
@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
 
                 // BreakFragment
                 R.id.breakFragment -> {
-                    if (TimerService.serviceIsRunning && !it.isChecked) {
+                    if (TimerService.serviceIsRunning.value == true && !it.isChecked) {
                         if (dialogOnPreferenceChanged(R.id.breakFragment, navController)) {
                             return@setOnItemSelectedListener false
                         }
@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity() {
 
                 // BreakLongFragment
                 R.id.breakLongFragment -> {
-                    if (TimerService.serviceIsRunning && !it.isChecked) {
+                    if (TimerService.serviceIsRunning.value == true && !it.isChecked) {
                         if (dialogOnPreferenceChanged(R.id.breakLongFragment, navController)) {
                             return@setOnItemSelectedListener false
                         }
@@ -128,7 +128,7 @@ class MainActivity : AppCompatActivity() {
                 // Resets timer on positive button press
                 navController.navigate(fragmentId)
                 sendCommandToService(Constants.ACTION_STOP_SERVICE)
-                TimerService.serviceIsRunning = false
+                TimerService.serviceIsRunning.value = false
                 dialogCancel = false
             }
             .show()
