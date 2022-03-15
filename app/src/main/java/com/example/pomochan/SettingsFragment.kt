@@ -15,25 +15,25 @@ import timber.log.Timber
 class SettingsFragment : PreferenceFragmentCompat() {
 
     private lateinit var timerOldValue: String
-    private var shortBreakOldValue = 0L
-    private var longBreakOldValue = 0L
+    private lateinit var shortBreakOldValue: String
+    private lateinit var longBreakOldValue: String
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
 
-        timerOldValue = loadSettings()
+        loadSettings()
         resetDialogOnBackstack()
-
-
-
     }
-
 
     private fun listenOnMainPreferenceChanged() {
         findPreference<Preference>("timer")?.setOnPreferenceChangeListener { preference, newValue ->
-            if (newValue !== timerOldValue && TimerService.serviceIsRunning.value == true) {
+            Timber.d("newValue: $newValue")
+            if (!newValue.equals(timerOldValue) && TimerService.serviceIsRunning.value == true) {
+                Timber.d("timerOldValue in conditional: $timerOldValue")
                 dialogOnPreferenceChanged()
                 timerOldValue = newValue.toString()
+            } else {
+                Timber.d("Do nothing")
             }
             true
         }
@@ -41,9 +41,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private fun listenOnShortBreakPreferenceChanged() {
         findPreference<Preference>("shortbreak")?.setOnPreferenceChangeListener { preference, newValue ->
-            if (newValue !== timerOldValue && TimerService.serviceIsRunning.value == true) {
+            if (!newValue.equals(shortBreakOldValue) && TimerService.serviceIsRunning.value == true) {
                 dialogOnPreferenceChanged()
-                timerOldValue = newValue.toString()
+                shortBreakOldValue = newValue.toString()
             }
             true
         }
@@ -51,9 +51,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private fun listenOnLongBreakPreferenceChanged() {
         findPreference<Preference>("longbreak")?.setOnPreferenceChangeListener { preference, newValue ->
-            if (newValue !== timerOldValue && TimerService.serviceIsRunning.value == true) {
+            if (!newValue.equals(longBreakOldValue) && TimerService.serviceIsRunning.value == true) {
                 dialogOnPreferenceChanged()
-                timerOldValue = newValue.toString()
+                longBreakOldValue = newValue.toString()
             }
             true
         }
@@ -75,10 +75,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
             .show()
     }
 
-    private fun loadSettings(): String {
+    private fun loadSettings() {
         val sp = PreferenceManager.getDefaultSharedPreferences(context)
         timerOldValue = sp.getString("timer", "").toString()
-        return timerOldValue
+        Timber.d("timerOldValue: $timerOldValue")
+        shortBreakOldValue = sp.getString("shortbreak", "").toString()
+        longBreakOldValue = sp.getString("longbreak", "").toString()
     }
 
     private fun sendCommandToService(action: String) {
@@ -100,14 +102,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
      * Enables reset of timer depending on which timer is running
      */
     private fun resetDialogOnBackstack() {
-        if (findNavController().isFragmentInBackStack(R.id.mainFragment)) {
-            listenOnMainPreferenceChanged()
-        } else if (findNavController().isFragmentInBackStack(R.id.breakFragment)) {
-            Timber.d("WOW BACKSTACK BREAKFRAGMENT FOUND BRAH")
-            listenOnShortBreakPreferenceChanged()
-        } else if (findNavController().isFragmentInBackStack(R.id.breakLongFragment)) {
-            Timber.d("WOW BACKSTACK BREAKLONGFRAGMENT FOUND BRAH")
-            listenOnLongBreakPreferenceChanged()
+        when {
+            findNavController().isFragmentInBackStack(R.id.mainFragment) -> {
+                listenOnMainPreferenceChanged()
+            }
+            findNavController().isFragmentInBackStack(R.id.breakFragment) -> {
+                listenOnShortBreakPreferenceChanged()
+            }
+            findNavController().isFragmentInBackStack(R.id.breakLongFragment) -> {
+                listenOnLongBreakPreferenceChanged()
+            }
         }
     }
 }

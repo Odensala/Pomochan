@@ -37,10 +37,7 @@ class BreakLongFragment : Fragment(R.layout.fragment_break_long) {
         updateCountdown()
         refreshStartTime()
 
-        /*// Progressbar
-        viewModel.progressBarLiveData.observe(viewLifecycleOwner, Observer {
-            binding.progressBarHor.progress = it
-        })*/
+        updateProgressBar()
 
         // Start/Pause button
         binding.buttonStartPause.setOnClickListener {
@@ -113,8 +110,18 @@ class BreakLongFragment : Fragment(R.layout.fragment_break_long) {
         }
         intent.apply {
             putExtra(Constants.EXTRA_TIMER, loadSettings())
+            putExtra(Constants.EXTRA_MAIN_TIMER_ACTIVE, "longbreak")
         }
         requireContext().startService(intent)
+    }
+
+    private fun updateProgressBar() {
+        var timerSettingInSeconds = loadSettings() / 1000
+        TimerService.progressBar.observe(viewLifecycleOwner) {
+            binding.progressBarHor.progress = it
+            binding.progressBarHor.max = timerSettingInSeconds.toInt()
+            Timber.d("progressbar setting: ${timerSettingInSeconds.toInt()}")
+        }
     }
 
     /**

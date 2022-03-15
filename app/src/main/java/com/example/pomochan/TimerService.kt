@@ -10,10 +10,16 @@ import android.os.CountDownTimer
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.pomochan.Constants.ACTION_LONGBREAK_TIMER_ACTIVE
 import com.example.pomochan.Constants.ACTION_PAUSE_SERVICE
+import com.example.pomochan.Constants.ACTION_SHOW_LONGBREAK_FRAGMENT
+import com.example.pomochan.Constants.ACTION_SHOW_MAIN_FRAGMENT
+import com.example.pomochan.Constants.ACTION_SHOW_SHORTBREAK_FRAGMENT
 import com.example.pomochan.Constants.ACTION_START_OR_RESUME_SERVICE
 import com.example.pomochan.Constants.ACTION_STOP_SERVICE
+import com.example.pomochan.Constants.EXTRA_MAIN_TIMER_ACTIVE
 import com.example.pomochan.Constants.EXTRA_TIMER
 import com.example.pomochan.Constants.NOTIFICATION_CHANNEL_ID
 import com.example.pomochan.Constants.NOTIFICATION_CHANNEL_NAME
@@ -25,26 +31,28 @@ class TimerService : LifecycleService() {
 
     private lateinit var countDownTimer: CountDownTimer
     private var startingTime: Long = 0
-
-    //private var timerStarted = false
     private var currentTime: Long = 5000
+    private lateinit var currentActiveTimer: String
 
+    var progressBarProgress = 0
     var isFirstRun = true
 
     companion object {
         val currentTimeLiveData = MutableLiveData<Long>()
         val timerRunning = MutableLiveData<Boolean>()
-        var serviceIsRunning = MutableLiveData<Boolean>()
+        val serviceIsRunning = MutableLiveData<Boolean>()
+        val progressBar = MutableLiveData<Int>()
     }
 
     override fun onCreate() {
-        Timber.d("TimerService onCreate called")
         super.onCreate()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Timber.d("onStartCommand started in TimerService")
         intent?.let {
+            currentActiveTimer = intent.getStringExtra(EXTRA_MAIN_TIMER_ACTIVE).toString()
+            Timber.d("currentActiveTimer: $currentActiveTimer")
             startingTime = intent.getLongExtra(EXTRA_TIMER, 5000)
             when (it.action) {
                 ACTION_START_OR_RESUME_SERVICE -> {
@@ -86,9 +94,9 @@ class TimerService : LifecycleService() {
                 currentTimeLiveData.value = currentTime
                 Timber.d("Timer: $currentTime")
 
-                /*// Updates progressbar
+                // Updates progressbar
                 progressBarProgress++
-                _progressBarLiveData.value = progressBarProgress*/
+                progressBar.value = progressBarProgress
             }
 
             override fun onFinish() {
@@ -108,12 +116,15 @@ class TimerService : LifecycleService() {
     }
 
     private fun resetTimer() {
+        //TODO maybe reset livedata, that way we can reduce code in MainFragment
         pauseTimer()
+        resetProgressBar()
         stopSelf()
-        // TODO needs values from shared pref
-        //currentTime = 5000
-        //currentTimeLiveData.value = currentTime
-        //resetProgressBar()
+    }
+
+    private fun resetProgressBar() {
+        progressBarProgress = 0
+        progressBar.value = progressBarProgress
     }
 
     override fun onDestroy() {
@@ -122,16 +133,42 @@ class TimerService : LifecycleService() {
 
     private fun pendingIntent(): PendingIntent {
         val pendingIntent: PendingIntent =
-            Intent(this, MainActivity::class.java).let { notificationIntent ->
+            Intent(this, MainActivity::class.java).also {
+                it.action = currentActiveTimer()
+                Timber.d("currentactivetime returns: ${currentActiveTimer()}")
+            }.let { notificationIntent ->
                 PendingIntent.getActivity(
                     this,
                     0,
                     notificationIntent,
                     // TODO check why this is marked
+                    // Indicates that if there already is a pending intent
+                    // it will update it instead of recreating it
                     PendingIntent.FLAG_UPDATE_CURRENT
                 )
             }
         return pendingIntent
+    }
+
+    private fun currentActiveTimer(): String {
+        var mainTimerKey = "main"
+        var shortBreakKey = "shortbreak"
+        var longBreakKey = "longbreak"
+
+        return when (currentActiveTimer) {
+            mainTimerKey -> {
+                ACTION_SHOW_MAIN_FRAGMENT
+            }
+            shortBreakKey -> {
+                ACTION_SHOW_SHORTBREAK_FRAGMENT
+            }
+            longBreakKey -> {
+                ACTION_SHOW_LONGBREAK_FRAGMENT
+            }
+            else -> {
+                ACTION_SHOW_LONGBREAK_FRAGMENT
+            }
+        }
     }
 
     private fun createNotificationChannel() {

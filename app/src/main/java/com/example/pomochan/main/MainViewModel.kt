@@ -116,11 +116,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }*/
 
-    fun resetProgressBar() {
-        progressBarProgress = 0
-        _progressBarLiveData.value = progressBarProgress
-    }
-
     override fun onCleared() {
         super.onCleared()
         // TODO Cancel the timer

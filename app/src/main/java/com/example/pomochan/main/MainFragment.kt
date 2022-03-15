@@ -12,6 +12,7 @@ import androidx.preference.PreferenceManager
 import com.example.pomochan.Constants.ACTION_PAUSE_SERVICE
 import com.example.pomochan.Constants.ACTION_START_OR_RESUME_SERVICE
 import com.example.pomochan.Constants.ACTION_STOP_SERVICE
+import com.example.pomochan.Constants.EXTRA_MAIN_TIMER_ACTIVE
 import com.example.pomochan.Constants.EXTRA_TIMER
 import com.example.pomochan.R
 import com.example.pomochan.TimerService
@@ -55,15 +56,12 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         // Sets correct start time
         refreshStartTime()
 
-        /*// Progressbar
-        viewModel.progressBarLiveData.observe(viewLifecycleOwner, Observer {
-            binding.progressBar.progress = it
-        })*/
-
         // Start/Pause button
         binding.buttonStartPause.setOnClickListener {
             toggleStart()
         }
+
+        updateProgressBar()
 
         // Reset button
         binding.buttonReset.setOnClickListener {
@@ -136,8 +134,18 @@ class MainFragment : Fragment(R.layout.fragment_main) {
         }
         intent.apply {
             putExtra(EXTRA_TIMER, loadSettings())
+            putExtra(EXTRA_MAIN_TIMER_ACTIVE, "main")
         }
         requireContext().startService(intent)
+    }
+
+    private fun updateProgressBar() {
+        var timerSettingInSeconds = loadSettings() / 1000
+        TimerService.progressBar.observe(viewLifecycleOwner) {
+            binding.progressBar.progress = it
+            binding.progressBar.max = timerSettingInSeconds.toInt()
+            Timber.d("progressbar setting: ${timerSettingInSeconds.toInt()}")
+        }
     }
 
     /**

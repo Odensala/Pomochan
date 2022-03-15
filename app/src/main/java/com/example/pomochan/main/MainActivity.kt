@@ -1,5 +1,6 @@
 package com.example.pomochan.main
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -11,6 +12,9 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.pomochan.Constants
+import com.example.pomochan.Constants.ACTION_SHOW_LONGBREAK_FRAGMENT
+import com.example.pomochan.Constants.ACTION_SHOW_MAIN_FRAGMENT
+import com.example.pomochan.Constants.ACTION_SHOW_SHORTBREAK_FRAGMENT
 import com.example.pomochan.R
 import com.example.pomochan.TimerService
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -18,16 +22,20 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
+    lateinit var navHostFragment: NavHostFragment
+    lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Timber.i("MainActivity created!")
 
+
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-        val navHostFragment =
+        // TODO figure out why we can't call navHostFragment from XML
+        navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        val navController = navHostFragment.navController
+        navController = navHostFragment.navController
 
         val appBarConfiguration = AppBarConfiguration(
             setOf(
@@ -36,8 +44,10 @@ class MainActivity : AppCompatActivity() {
                 R.id.breakLongFragment
             )
         )
+
         setupActionBarWithNavController(navController, appBarConfiguration)
         bottomNavigationView.setupWithNavController(navController)
+        navigateToFragmentIfNeeded(intent)
 
         // TODO This whole part can probably be made more efficient (At least it werkz lol)
         // Bottom navigation selectedListener
@@ -110,6 +120,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
+     * If activity is not destroyed
+     * makes sure we still navigate correctly when
+     * notification is clicked
+     */
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        navigateToFragmentIfNeeded(intent)
+    }
+
+    /**
      * Displays reset dialog
      * @fragmentId fragment we want to navigate to
      * @return dialogCancel which returns Boolean depending on user's chosen dialog option
@@ -135,6 +155,10 @@ class MainActivity : AppCompatActivity() {
         return dialogCancel
     }
 
+    private fun resetDialogOnBottomNav() {
+        // TODO figure out a way for navController to be incorporated here
+    }
+
     /**
      * Stop service intent
      */
@@ -156,5 +180,26 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = this.findNavController(R.id.nav_host_fragment)
         return navController.navigateUp()
+    }
+
+    /**
+     * Handles navigation from notification
+     */
+    private fun navigateToFragmentIfNeeded(intent: Intent?) {
+        navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navController = navHostFragment.navController
+
+        when (intent?.action) {
+            ACTION_SHOW_MAIN_FRAGMENT -> {
+                navController.navigate(R.id.action_global_mainFragment)
+            }
+            ACTION_SHOW_SHORTBREAK_FRAGMENT -> {
+                navController.navigate(R.id.action_global_shortbreakFragment)
+            }
+            ACTION_SHOW_LONGBREAK_FRAGMENT -> {
+                navController.navigate(R.id.action_global_longbreakFragment)
+            }
+        }
     }
 }

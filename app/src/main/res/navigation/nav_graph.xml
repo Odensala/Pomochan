@@ -8,6 +8,12 @@
     <action android:id="@+id/action_global_mainFragment"
         app:destination="@id/mainFragment"
         app:launchSingleTop="true"/>
+    <action android:id="@+id/action_global_shortbreakFragment"
+        app:destination="@id/breakFragment"
+        app:launchSingleTop="true"/>
+    <action android:id="@+id/action_global_longbreakFragment"
+        app:destination="@id/breakLongFragment"
+        app:launchSingleTop="true"/>
 
     <fragment
         android:id="@+id/mainFragment"

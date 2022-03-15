@@ -36,16 +36,12 @@ class BreakFragment : Fragment(R.layout.fragment_break) {
 
         // Method needed to observe when fragment is recreated
         updateCountdown()
-        binding = FragmentBreakBinding.inflate(inflater, container, false)
 
+        binding = FragmentBreakBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(this).get(BreakViewModel::class.java)
 
         refreshStartTime()
-
-        /*// Progressbar
-        viewModel.progressBarLiveData.observe(viewLifecycleOwner, Observer {
-            binding.progressBarHor.progress = it
-        })*/
+        updateProgressBar()
 
         // Start/Pause button
         binding.buttonStartPause.setOnClickListener {
@@ -112,8 +108,18 @@ class BreakFragment : Fragment(R.layout.fragment_break) {
         }
         intent.apply {
             putExtra(Constants.EXTRA_TIMER, loadSettings())
+            putExtra(Constants.EXTRA_MAIN_TIMER_ACTIVE, "shortbreak")
         }
         requireContext().startService(intent)
+    }
+
+    private fun updateProgressBar() {
+        var timerSettingInSeconds = loadSettings() / 1000
+        TimerService.progressBar.observe(viewLifecycleOwner) {
+            binding.progressBarHor.progress = it
+            binding.progressBarHor.max = timerSettingInSeconds.toInt()
+            Timber.d("progressbar setting: ${timerSettingInSeconds.toInt()}")
+        }
     }
 
     /**
